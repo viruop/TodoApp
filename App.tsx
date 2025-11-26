@@ -4,28 +4,18 @@ import {
   SafeAreaProvider,
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
+import AppNavigator from './src/navigation/AppNavigator';
+import { Provider } from 'react-redux';
+import { store } from './src/store/store';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 function App() {
-  const isDarkMode = useColorScheme() === 'dark';
-
   return (
-    <SafeAreaProvider>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <AppContent />
-    </SafeAreaProvider>
-  );
-}
-
-function AppContent() {
-  const safeAreaInsets = useSafeAreaInsets();
-
-  return (
-    <View style={styles.container}>
-      <NewAppScreen
-        templateFileName="App.tsx"
-        safeAreaInsets={safeAreaInsets}
-      />
-    </View>
+    <GestureHandlerRootView>
+      <Provider store={store}>
+        <AppNavigator />
+      </Provider>
+    </GestureHandlerRootView>
   );
 }
 
