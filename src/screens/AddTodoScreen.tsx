@@ -36,7 +36,6 @@ const AddTodoScreen: React.FC<AddTodoScreenProps> = ({ navigation }) => {
     const trimmedTitle = title.trim();
 
     if (trimmedTitle) {
-      // Dispatch action to add todo to Redux store
       dispatch(addTodo(trimmedTitle));
       navigation.goBack();
     } else {

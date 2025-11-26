@@ -15,7 +15,6 @@ export const fetchTodos = createAsyncThunk('todos/fetchTodos', async () => {
   const response = await fetch('https://jsonplaceholder.typicode.com/todos');
   const data = await response.json();
 
-  // Take first 20 items for better performance
   const todosWithTimestamps: Todo[] = data.slice(0, 20).map((todo: any) => ({
     ...todo,
     created_at: new Date().toISOString(),
@@ -137,7 +136,6 @@ const todoSlice = createSlice({
   },
 });
 
-// Export actions
 export const {
   addTodo,
   editTodo,
@@ -154,18 +152,15 @@ export const selectSortBy = (state: { todos: TodoState }) => state.todos.sortBy;
 export const selectIsLoading = (state: { todos: TodoState }) =>
   state.todos.isLoading;
 
-// Selector for filtered and sorted todos
 export const selectFilteredAndSortedTodos = (state: { todos: TodoState }) => {
   let filtered = [...state.todos.todos];
 
-  // Apply filter
   if (state.todos.filter === 'Active') {
     filtered = filtered.filter(todo => !todo.completed);
   } else if (state.todos.filter === 'Done') {
     filtered = filtered.filter(todo => todo.completed);
   }
 
-  // Apply sort
   if (state.todos.sortBy === 'MostRecent') {
     filtered.sort(
       (a, b) =>
@@ -178,11 +173,9 @@ export const selectFilteredAndSortedTodos = (state: { todos: TodoState }) => {
   return filtered;
 };
 
-// Selector for total count
 export const selectTotalCount = (state: { todos: TodoState }) =>
   state.todos.todos.length;
 
-// Selector for completed count
 export const selectCompletedCount = (state: { todos: TodoState }) =>
   state.todos.todos.filter(todo => todo.completed).length;
 

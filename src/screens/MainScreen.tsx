@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -11,19 +11,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { StackNavigationProp } from '@react-navigation/stack';
 import {
   fetchTodos,
-  //   loadTodosFromStorage,
   toggleTodo,
   deleteTodo,
   editTodo,
   setFilter,
   setSortBy,
-  selectFilteredAndSortedTodos,
+  selectTodos,
   selectFilter,
   selectSortBy,
   selectIsLoading,
-  selectTotalCount,
-  selectCompletedCount,
-  selectTodos,
 } from '../store/todoSlice';
 import { AppDispatch } from '../store/store';
 import TodoItem from '../components/TodoItem';
@@ -43,46 +39,76 @@ interface MainScreenProps {
 const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
   const dispatch = useDispatch<AppDispatch>();
 
-  // Select data from Redux store using selectors
-  const filteredAndSortedTodos = useSelector(selectFilteredAndSortedTodos);
+  const allTodos = useSelector(selectTodos);
   const filter = useSelector(selectFilter);
   const sortBy = useSelector(selectSortBy);
   const isLoading = useSelector(selectIsLoading);
-  const totalCount = useSelector(selectTotalCount);
-  const completedCount = useSelector(selectCompletedCount);
-  const allTodos = useSelector(selectTodos);
+
+  const filteredAndSortedTodos = useMemo(() => {
+    let filtered = [...allTodos];
+
+    if (filter === 'Active') {
+      filtered = filtered.filter(todo => !todo.completed);
+    } else if (filter === 'Done') {
+      filtered = filtered.filter(todo => todo.completed);
+    }
+
+    if (sortBy === 'MostRecent') {
+      filtered.sort(
+        (a, b) =>
+          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime(),
+      );
+    } else {
+      filtered.sort((a, b) => a.id - b.id);
+    }
+
+    return filtered;
+  }, [allTodos, filter, sortBy]);
+
+  const totalCount = useMemo(() => allTodos.length, [allTodos]);
+  const completedCount = useMemo(
+    () => allTodos.filter(todo => todo.completed).length,
+    [allTodos],
+  );
 
   useEffect(() => {
-    // Load todos from local storage first
-    // dispatch(loadTodosFromStorage()).then((result) => {
-    //   // If no local data, fetch from API
-    //   if (!result.payload || (result.payload as any[]).length === 0) {
-    //     dispatch(fetchTodos());
-    //   }
-    // });
     dispatch(fetchTodos());
   }, [dispatch]);
 
-  // Handler functions
-  const handleToggle = (id: number) => {
-    dispatch(toggleTodo(id));
-  };
+  const handleToggle = React.useCallback(
+    (id: number) => {
+      dispatch(toggleTodo(id));
+    },
+    [dispatch],
+  );
 
-  const handleDelete = (id: number) => {
-    dispatch(deleteTodo(id));
-  };
+  const handleDelete = React.useCallback(
+    (id: number) => {
+      dispatch(deleteTodo(id));
+    },
+    [dispatch],
+  );
 
-  const handleEdit = (id: number, title: string) => {
-    dispatch(editTodo({ id, title }));
-  };
+  const handleEdit = React.useCallback(
+    (id: number, title: string) => {
+      dispatch(editTodo({ id, title }));
+    },
+    [dispatch],
+  );
 
-  const handleFilterChange = (newFilter: typeof filter) => {
-    dispatch(setFilter(newFilter));
-  };
+  const handleFilterChange = React.useCallback(
+    (newFilter: typeof filter) => {
+      dispatch(setFilter(newFilter));
+    },
+    [dispatch],
+  );
 
-  const handleSortChange = (newSort: typeof sortBy) => {
-    dispatch(setSortBy(newSort));
-  };
+  const handleSortChange = React.useCallback(
+    (newSort: typeof sortBy) => {
+      dispatch(setSortBy(newSort));
+    },
+    [dispatch],
+  );
 
   if (isLoading) {
     return (
@@ -166,7 +192,6 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: '#000',
     padding: 20,
-    paddingTop: 60,
   },
   headerTitle: {
     fontSize: 28,
