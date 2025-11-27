@@ -131,7 +131,6 @@ const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
         </View>
       </View>
 
-      {/* Filter and Sort Controls */}
       <FilterSort
         filter={filter}
         sortBy={sortBy}
@@ -139,7 +138,6 @@ const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
         onSortChange={handleSortChange}
       />
 
-      {/* Todo List */}
       <FlatList
         data={filteredAndSortedTodos}
         keyExtractor={item => item.id.toString()}
@@ -162,7 +160,6 @@ const MainScreen: React.FC<MainScreenProps> = ({ navigation }) => {
         }
       />
 
-      {/* Floating Action Button */}
       <TouchableOpacity
         style={styles.fab}
         onPress={() => navigation.navigate('AddTodo')}
